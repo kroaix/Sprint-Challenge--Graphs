@@ -28,7 +28,40 @@ player = Player(world.starting_room)
 # Fill this out with directions to walk
 # traversal_path = ['n', 'n']
 traversal_path = []
+#path for going backwards to find unvisited rooms
+backward_path = []
+#keeping track of visited rooms
+visited = set()
+#we'll need to backtrack to go to previously visited room that still has moves available
+opposite_directions = {'n': 's', 's': 'n', 'e': 'w', 'w': 'e'}
 
+#while there are still unvisited rooms
+while len(visited) < len(room_graph):
+    #temp variable to initialize the next room
+    next_room = None
+    #current room's neighbors or "exits"
+    directions = player.current_room.get_exits()
+    #for each neighbor in neighbors
+    for direction in directions:
+        #if not in visited, this will be our next room
+        if player.current_room.get_room_in_direction(direction) not in visited:
+            next_room = direction
+
+    if next_room is not None:
+        traversal_path.append(next_room)
+        backward_path.append(opposite_directions[next_room])
+        #player will move to the next room
+        player.travel(next_room)
+        #add to visited
+        visited.add(player.current_room)
+    
+    else: #move backwards so we can find a room with an unviisted neighbor
+        #popping last item
+        next_room = backward_path.pop()
+        #add that to the path
+        traversal_path.append(next_room)
+        #move there
+        player.travel(next_room)
 
 
 # TRAVERSAL TEST - DO NOT MODIFY
